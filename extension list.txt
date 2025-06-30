@@ -1,0 +1,14 @@
+debug-html
+ESLint
+JavaScript (es6) code snippets
+live server
+netlify
+node.js extension pack
+npm
+npm intellisense
+path intellisense
+prettier - code formatter
+react developer tools
+rest client
+search node_nodules
+sqltools

@@ -1,0 +1,31 @@
+CREATE TABLE guests (
+  id SERIAL PRIMARY KEY,
+  firstname VARCHAR(50) NOT NULL,
+  lastname VARCHAR(50) NOT NULL,
+  email TEXT NOT NULL,
+  contact VARCHAR(20) NOT NULL,
+  person TEXT NOT NULL,
+  purpose TEXT NOT NULL,
+  timein TIMESTAMP NOT NULL,
+  timeout TIMESTAMP NOT NULL
+);
+
+ALTER TABLE guests 
+ALTER COLUMN timein SET DATA TYPE TIMESTAMP WITHOUT TIME ZONE;
+ALTER TABLE guests 
+ALTER COLUMN timeout SET DATA TYPE TIMESTAMP WITHOUT TIME ZONE;
+
+CREATE POLICY "Allow insert for all users"
+ON public.guests
+FOR INSERT
+TO public
+WITH CHECK (true);
+
+
+
+
+login: 
+raffyfernandez2102@gmail.com
+
+password:
+aT2T03N22#

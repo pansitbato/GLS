@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guest Logging System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="background-shape"></div>
+  <div class="container">
+    <div class="form-card">
+      <h2>Guest Registration</h2>
+
+      <div id="warning-modal" class="modal">
+        <div class="modal-content">
+          <p>Please fill out all required fields before submitting.</p>
+          <button onclick="closeModal('warning-modal')">OK</button>
+        </div>
+      </div>
+
+      <div id="success-modal" class="modal">
+        <div class="modal-content">
+          <p>Guest registered successfully!</p>
+          <button onclick="closeModal('success-modal')">OK</button>
+        </div>
+      </div>
+
+      <form id="guestForm" novalidate>
+        <label for="firstname">First Name</label>
+        <input type="text" id="firstname" name="firstname" required>
+
+        <label for="lastname">Last Name</label>
+        <input type="text" id="lastname" name="lastname" required>
+
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="contact">Contact Number</label>
+        <input type="tel" id="contact" name="contact" required>
+
+        <label for="person">Person to Visit</label>
+        <textarea id="person" name="person" required></textarea>
+
+        <label for="purpose">Purpose of Visit</label>
+        <textarea id="purpose" name="purpose" rows="4" required></textarea>
+
+        <div class="time-fields">
+          <div>
+            <label for="timein">Time In</label>
+            <input type="time" id="timein" name="timein" required>
+          </div>
+          <div>
+            <label for="timeout">Time Out</label>
+            <input type="time" id="timeout" name="timeout" required>
+          </div>
+        </div>
+
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("guestForm").addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      const form = document.getElementById("guestForm");
+
+      // Validate form
+      if (!form.checkValidity()) {
+        showModal("warning-modal");
+
+        // Highlight invalid fields
+        const fields = form.querySelectorAll("input, textarea");
+        fields.forEach(field => {
+          field.style.borderColor = field.checkValidity() ? "#ccc" : "red";
+        });
+
+        return; // Stop form submission
+      }
+
+      let submitButton = document.querySelector("button[type='submit']");
+      submitButton.disabled = true;
+      submitButton.textContent = "Registering...";
+
+      let formData = {
+        firstname: document.getElementById("firstname").value,
+        lastname: document.getElementById("lastname").value,
+        email: document.getElementById("email").value,
+        contact: document.getElementById("contact").value,
+        person: document.getElementById("person").value,
+        purpose: document.getElementById("purpose").value,
+        timein: document.getElementById("timein").value,
+        timeout: document.getElementById("timeout").value
+      };
+
+      try {
+        const response = await fetch("http://localhost:3000/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+        console.log("API Response:", result);
+
+        if (!result || typeof result.message === "undefined") {
+          throw new Error("Unexpected server response");
+        }
+
+        if (result.message === "Register Successful") {
+          showModal("success-modal");
+          form.reset();
+          submitButton.textContent = "Submitted";
+
+          // Reset borders
+          form.querySelectorAll("input, textarea").forEach(field => {
+            field.style.borderColor = "#ccc";
+          });
+
+        } else {
+          alert("Error: " + (result.error || "Unknown error"));
+          submitButton.disabled = false;
+          submitButton.textContent = "Submit";
+        }
+
+      } catch (error) {
+        console.error("Network or Server Error:", error);
+        alert("Network or Server Error: " + error.message);
+        submitButton.disabled = false;
+        submitButton.textContent = "Submit";
+      }
+    });
+
+    function showModal(id) {
+      document.getElementById(id).classList.add("show");
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("show");
+
+      if (id === "success-modal") {
+        const submitButton = document.querySelector("button[type='submit']");
+        submitButton.disabled = false;
+        submitButton.textContent = "Submit";
+      }
+
+      // Reset red borders when warning modal is closed
+      if (id === "warning-modal") {
+        const fields = document.querySelectorAll("input, textarea");
+        fields.forEach(field => {
+          field.style.borderColor = "#ccc";
+        });
+      }
+    }
+  </script>
+</body>
+</html>
